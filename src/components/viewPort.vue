@@ -1,6 +1,6 @@
 <template>
 <div id="container" >
-  <span>{{ title }}</span>
+  <!-- <span>{{ title }}</span>
   <span v-once>{{ title }} 没变吧</span>
   <span v-if="flag">now shown</span>
   <p>
@@ -10,10 +10,11 @@
   </p>
   <p>
 
-  </p>
+  </p> -->
 </div>
 </template>
 <script>
+import * as THREE from 'three'
 export default {
     name:'viewPort',
     props:{
@@ -27,7 +28,19 @@ export default {
         url: "assets/images/threelogo.png"
       }
     },
+    // 
+    created(){
+
+    },
+    mounted(){
+      this.initScene()
+    },
     methods:{
+      initScene(){
+        // 创建3D场景对象Scene
+        const scene = new THREE.Scene();
+
+      },
       handleClick() {
         alert("clicked!")
       }
