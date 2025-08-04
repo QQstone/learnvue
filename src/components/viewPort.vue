@@ -24,6 +24,7 @@
 <script>
 import axios from 'axios';
 import * as THREE from 'three'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 export default {
   name: 'viewPort',
   props: {
@@ -40,6 +41,7 @@ export default {
         age: ''
       },
       renderer: null,
+      canvas:null,
       camera: null, 
       scene: null,
       deboundedTimer:null
@@ -52,23 +54,26 @@ export default {
   mounted() {
     this.initScene()
     window.addEventListener('resize', this.handleResize);
+    window.addEventListener('dblclick', this.handleDblclick)
   },
   beforeUnmount() {
     window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('dblclick', this.handleDblclick);
+  
     if(this.deboundedTimer){
       clearTimeout(this.deboundedTimer)
     }
   },
   methods: {
     initScene() {
-      const canvas = document.createElement('canvas')
+      this.canvas = document.createElement('canvas')
       const sizes = {
-        width: this.$refs.container.clientWidth-1,
-        height: this.$refs.container.clientHeight-1
+        width: this.$refs.container.clientWidth,
+        height: this.$refs.container.clientHeight
       }
-      canvas.width = sizes.width;
-      canvas.height = sizes.height;
-      this.$refs.container.appendChild(canvas);
+      this.canvas.width = sizes.width;
+      this.canvas.height = sizes.height;
+      this.$refs.container.appendChild(this.canvas);
       // 创建3D场景对象Scene
       this.scene = new THREE.Scene();
       // Geometry
@@ -81,13 +86,26 @@ export default {
       mesh.position.set(0, 0, -10);
       this.scene.add(mesh)
 
+
       // 创建相机对象Camera
       
       this.camera = new THREE.PerspectiveCamera(75, sizes.width/sizes.height, 0.1, 1000);
       this.scene.add(this.camera);
 
-      this.renderer = new THREE.WebGLRenderer({canvas: canvas});
+      this.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio,2))
       this.renderer.render(this.scene, this.camera);
+
+      
+      const controls = new OrbitControls(this.camera, this.renderer.domElement)
+      this.camera.position.set( 0, 20, 100 );
+      controls.update();
+      // const animate = ()=>{
+      //   controls.update();
+      //   requestAnimationFrame(animate)
+      //   this.renderer.render(this.scene, this.camera);
+      // }
+      // animate()
     },
 
     handleResize(){
@@ -102,7 +120,15 @@ export default {
           this.camera.aspect = sizes.width / sizes.height;
           this.camera.updateProjectionMatrix();
           this.renderer.setSize(sizes.width, sizes.height);
-      },300)
+      },50)
+    },
+
+    handleDblclick(){
+      if(!document.fullscreenElement){
+        this.canvas.requestFullscreen()
+      }else{
+        document.exitFullscreen()
+      }
     },
     handleClick() {
       this.flag = !this.flag;
@@ -137,7 +163,7 @@ export default {
 <style scoped>
 #container {
   margin: 0;
-  width: 100%;
+  width: 100vw;
   height: 100vh;
   background: #fff;
 }

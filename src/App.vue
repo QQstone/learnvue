@@ -24,10 +24,9 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #b1b4b7;
   margin: 0;
-  width: 100%;
+  width: 100vw;
   height: 100vh
 }
 </style>
