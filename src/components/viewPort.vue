@@ -25,6 +25,8 @@
 import axios from 'axios';
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as dat from 'dat.gui'
+
 export default {
   name: 'viewPort',
   props: {
@@ -100,12 +102,32 @@ export default {
       const controls = new OrbitControls(this.camera, this.renderer.domElement)
       this.camera.position.set( 0, 20, 100 );
       controls.update();
-      // const animate = ()=>{
-      //   controls.update();
-      //   requestAnimationFrame(animate)
-      //   this.renderer.render(this.scene, this.camera);
-      // }
-      // animate()
+      const animate = ()=>{
+        controls.update();
+        requestAnimationFrame(animate)
+        this.renderer.render(this.scene, this.camera);
+      }
+      animate()
+
+      this.gui = new dat.GUI()
+      const parameters = {
+        color:0xaaaaaa,
+        wireframe: false,
+        x:2
+      }
+
+      this.gui.addColor(parameters, 'color')
+      .onChange(val=>{
+        material.color.set(val)
+      });
+      this.gui.add(parameters,'wireframe').onChange(flag=>{
+        material.wireframe = flag
+      })
+      this.gui.add(parameters, 'x')
+      .min(-3).max(3).step(0.1)
+      .onChange(val=>{
+        mesh.position.setX(val)
+      })
     },
 
     handleResize(){
