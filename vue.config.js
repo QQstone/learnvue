@@ -1,16 +1,19 @@
 const { defineConfig } = require('@vue/cli-service')
+const packageName = require('./package.json').name;
 
 module.exports = defineConfig({
   transpileDependencies: true,
-  // chainWebpack: config => {
-  //   config.module
-  //     .rule('images')
-  //     .test(/\.(png|jpe?g|gif|bmp)(\?.*)?$/)
-  //     .use('url-loader')
-  //     .loader('url-loader')
-  //     .options({
-  //       limit: 10000,
-  //       name: 'img/[name].[hash:7].[ext]'
-  //     })
-  // }
+  devServer: {
+    port: 8081,
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
+  },
+  configureWebpack: {
+    output: {
+      library: `${packageName}-[name]`,
+      libraryTarget: 'umd',
+      chunkLoadingGlobal: `webpackJsonp_${packageName}`,
+    }
+  }
 })
