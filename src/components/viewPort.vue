@@ -1,10 +1,10 @@
 <template>
   <div id="container" ref="container">
-    <p>
+    <!-- <p>
       <a v-on:click="handleClick">
         <img v-bind:src="url" :class="[flag ? 'imgSize1' : 'imgSize2']" />
       </a>
-    </p>
+    </p> -->
     <!-- <span>{{ title }}</span>
     <span v-once>{{ title }} 没变吧</span>
     <span v-if="flag">now shown</span>
