@@ -9,7 +9,7 @@ let instance = null;
 
 function render(props = {}) {
   const { container } = props;
-  
+
   instance = new Vue({
     router,
     render: h => h(App)
@@ -40,4 +40,8 @@ export async function unmount() {
   instance.$destroy();
   instance.$el.innerHTML = '';
   instance = null;
+}
+
+export async function update(props) {
+  console.log('update props', props)
 }
