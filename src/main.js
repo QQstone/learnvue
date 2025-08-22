@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
 import './public-path'
-import router from './router'
 
 Vue.config.productionTip = false
 
@@ -11,7 +10,6 @@ function render(props = {}) {
   const { container } = props;
 
   instance = new Vue({
-    router,
     render: h => h(App)
   }).$mount(container ? container.querySelector('#app') : '#app')
 }
