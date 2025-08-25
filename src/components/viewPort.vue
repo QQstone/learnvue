@@ -1,10 +1,10 @@
 <template>
   <div id="container" ref="container">
-    <p>
+    <!-- <p>
       <a v-on:click="handleClick">
         <img v-bind:src="url" :class="[flag ? 'imgSize1' : 'imgSize2']" />
       </a>
-    </p>
+    </p> -->
     <!-- <span>{{ title }}</span>
     <span v-once>{{ title }} 没变吧</span>
     <span v-if="flag">now shown</span>
@@ -74,14 +74,10 @@ export default {
   },
   methods: {
     initScene() {
-      this.canvas = document.createElement('canvas')
       const sizes = {
         width: this.$refs.container.clientWidth,
         height: this.$refs.container.clientHeight
       }
-      this.canvas.width = sizes.width;
-      this.canvas.height = sizes.height;
-      this.$refs.container.appendChild(this.canvas);
       // 创建3D场景对象Scene
       this.scene = new THREE.Scene();
       // Geometry
@@ -117,7 +113,9 @@ export default {
       this.camera = new THREE.PerspectiveCamera(75, sizes.width/sizes.height, 0.1, 1000);
       this.scene.add(this.camera);
 
-      this.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
+      this.renderer = new THREE.WebGLRenderer();
+      this.renderer.setSize(sizes.width, sizes.height)
+      this.$refs.container.appendChild(this.renderer.domElement)
       this.renderer.setPixelRatio(Math.min(window.devicePixelRatio,2))
       this.renderer.render(this.scene, this.camera);
 
@@ -221,6 +219,7 @@ export default {
   width: 100vw;
   height: 100vh;
   background: #fff;
+  overflow: hidden;
 }
 
 .imgSize1 {
