@@ -3,7 +3,7 @@ const packageName = require('./package.json').name;
 
 module.exports = defineConfig({
   transpileDependencies: true,
-  
+  publicPath:'http://localhost:8081/',
   devServer: {
     port: 8081,
     headers: {
