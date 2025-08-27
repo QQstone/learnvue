@@ -1,11 +1,12 @@
 <template>
-  <div id="container" ref="container">
-    <!-- <p>
+  <div>
+    <div id="container" ref="container">
+      <!-- <p>
       <a v-on:click="handleClick">
         <img v-bind:src="url" :class="[flag ? 'imgSize1' : 'imgSize2']" />
       </a>
     </p> -->
-    <!-- <span>{{ title }}</span>
+      <!-- <span>{{ title }}</span>
     <span v-once>{{ title }} 没变吧</span>
     <span v-if="flag">now shown</span>
     <p>
@@ -24,6 +25,8 @@
       <input v-model="editForm.age" placeholder="Age" />
       <button type="submit">Submit</button>
     </form> -->
+    </div>
+    <ControlPanel></ControlPanel>
   </div>
 </template>
 <script>
@@ -32,11 +35,17 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import * as dat from 'dat.gui'
 import texturePath from '@/assets/images/threelogo.png'
+import ControlPanel from './controlPanel.vue'
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 
 export default {
   name: 'viewPort',
   props: {
     //target
+  },
+  components: {
+    ControlPanel
   },
   data() {
     return {
@@ -49,10 +58,10 @@ export default {
         age: ''
       },
       renderer: null,
-      canvas:null,
-      camera: null, 
+      camera: null,
       scene: null,
-      deboundedTimer:null
+      deboundedTimer: null,
+      textMesh: null,
     }
   },
   // 
@@ -67,8 +76,8 @@ export default {
   beforeUnmount() {
     window.removeEventListener('resize', this.handleResize);
     window.removeEventListener('dblclick', this.handleDblclick);
-  
-    if(this.deboundedTimer){
+
+    if (this.deboundedTimer) {
       clearTimeout(this.deboundedTimer)
     }
   },
@@ -82,15 +91,15 @@ export default {
       this.scene = new THREE.Scene();
       // Geometry
       const geometry = new THREE.BoxGeometry(50, 50, 50);
-      const texture = new THREE.TextureLoader().load(texturePath, ()=>{
+      const texture = new THREE.TextureLoader().load(texturePath, () => {
         console.log('load sccuess')
-      },()=>{
+      }, () => {
         console.log('loading')
-      }, err=>{
+      }, err => {
         console.log(err)
       })
       console.log(texture)
-      let material = new THREE.MeshBasicMaterial({/*color: '#aaa', wireframe:true,*/ map:texture})
+      let material = new THREE.MeshBasicMaterial({/*color: '#aaa', wireframe:true,*/ map: texture })
       // Mesh
       const mesh = new THREE.Mesh(geometry, material)
       mesh.rotateY(45)
@@ -102,28 +111,28 @@ export default {
       const planeGeometry = new THREE.PlaneGeometry(100, 100, 25, 25)
       const plane = new THREE.Mesh(
         planeGeometry,
-        new THREE.MeshBasicMaterial({color: '#aaa'})
+        new THREE.MeshBasicMaterial({ color: '#aaa' })
       )
-      plane.position.set(0,0, -200)
+      plane.position.set(0, 0, -200)
       this.scene.add(plane)
 
 
       // 创建相机对象Camera
-      
-      this.camera = new THREE.PerspectiveCamera(75, sizes.width/sizes.height, 0.1, 1000);
+
+      this.camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
       this.scene.add(this.camera);
 
       this.renderer = new THREE.WebGLRenderer();
       this.renderer.setSize(sizes.width, sizes.height)
       this.$refs.container.appendChild(this.renderer.domElement)
-      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio,2))
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       this.renderer.render(this.scene, this.camera);
 
-      
+
       const controls = new OrbitControls(this.camera, this.renderer.domElement)
-      this.camera.position.set( 0, 200, 500 );
+      this.camera.position.set(0, 200, 500);
       controls.update();
-      const animate = ()=>{
+      const animate = () => {
         controls.update();
         requestAnimationFrame(animate)
         this.renderer.render(this.scene, this.camera);
@@ -132,54 +141,54 @@ export default {
 
       this.gui = new dat.GUI()
       const parameters = {
-        color:0xaaaaaa,
+        color: 0xaaaaaa,
         wireframe: false,
-        x:2,
-        isTextured:false
+        x: 2,
+        isTextured: false
       }
 
       this.gui.addColor(parameters, 'color')
-      .onChange(val=>{
-        material.color.set(val)
-      });
-      this.gui.add(parameters,'wireframe').onChange(flag=>{
+        .onChange(val => {
+          material.color.set(val)
+        });
+      this.gui.add(parameters, 'wireframe').onChange(flag => {
         material.wireframe = flag
       })
-      this.gui.add(parameters, 'isTextured').onChange(flag=>{
-        if(flag){
+      this.gui.add(parameters, 'isTextured').onChange(flag => {
+        if (flag) {
           mesh.material.map = texture;
-        }else{
+        } else {
           mesh.material.map = null;
           //mesh.material.color.set('#aaa');
         }
         mesh.material.needsUpdate = true;
       })
       this.gui.add(parameters, 'x')
-      .min(-3).max(3).step(0.1)
-      .onChange(val=>{
-        mesh.position.setX(val)
-      })
+        .min(-3).max(3).step(0.1)
+        .onChange(val => {
+          mesh.position.setX(val)
+        })
     },
 
-    handleResize(){
-      if(!this.renderer) return;
-      if(this.deboundedTimer) clearTimeout(this.deboundedTimer)
-        this.deboundedTimer = setTimeout(()=>{
-          console.log('here here')
-          const sizes = {
-            width: this.$refs.container.clientWidth,
-            height: this.$refs.container.clientHeight
-          }
-          this.camera.aspect = sizes.width / sizes.height;
-          this.camera.updateProjectionMatrix();
-          this.renderer.setSize(sizes.width, sizes.height);
-      },50)
+    handleResize() {
+      if (!this.renderer) return;
+      if (this.deboundedTimer) clearTimeout(this.deboundedTimer)
+      this.deboundedTimer = setTimeout(() => {
+        console.log('here here')
+        const sizes = {
+          width: this.$refs.container.clientWidth,
+          height: this.$refs.container.clientHeight
+        }
+        this.camera.aspect = sizes.width / sizes.height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(sizes.width, sizes.height);
+      }, 50)
     },
 
-    handleDblclick(){
-      if(!document.fullscreenElement){
+    handleDblclick() {
+      if (!document.fullscreenElement) {
         this.canvas.requestFullscreen()
-      }else{
+      } else {
         document.exitFullscreen()
       }
     },
@@ -208,6 +217,48 @@ export default {
       }).catch(error => {
         console.error('Error submitting form:', error);
       });
+    },
+    init3DText(content) {
+      const fontLoader = new FontLoader()
+      const fontUrl = new URL('@/assets/fonts/Arial_Regular.json', import.meta.url).href;
+      fontLoader.load(fontUrl, (font) => {
+        const textGeometry = new TextGeometry(
+          content,
+          {
+            font,
+            size: 15,
+            depth: 0.2, /** 原height属性 */
+            curveSegments: 12,
+            bevelEnabled: true, /**斜角 */
+            bevelThickness: 0.3,
+            bevelSize: 0.2,
+            bevelOffset: 0,
+            bevelSegments: 5
+          }
+        )
+
+        const textMaterial = new THREE.MeshBasicMaterial({ color: 'red'/*, wireframe: true */})
+        const textMesh = new THREE.Mesh(textGeometry, textMaterial)
+        this.textMesh = textMesh
+        this.scene.add(this.textMesh)
+        this.renderer.render(this.scene, this.camera);
+      },()=>{},err=>{
+        console.log(err)
+      })
+    },
+    toggle3DText(show) {
+      if (show) {
+          this.init3DText('Hello Huge')
+      } else {
+        if (this.textMesh) {
+          this.scene.remove(this.textMesh)
+        }
+      }
+    }
+  },
+  watch: {
+    '$store.state.isShowText'(newVal) {
+        this.toggle3DText(newVal)
     }
   }
 }
